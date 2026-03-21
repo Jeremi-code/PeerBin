@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
 @import 'highlight.js/styles/atom-one-dark.css';
 
-:root {
+:root, [data-theme="dark"] {
   --bg-color: #0c0d14;
   --surface-color: rgba(21, 23, 35, 0.6);
   --surface-border: rgba(255, 255, 255, 0.08);
@@ -15,6 +15,22 @@
   --success-glow: rgba(16, 185, 129, 0.4);
   --danger-color: #f43f5e;
   --danger-glow: rgba(244, 63, 94, 0.4);
+}
+
+[data-theme="light"] {
+  --bg-color: #f1f5f9;
+  --surface-color: rgba(255, 255, 255, 0.6);
+  --surface-border: rgba(0, 0, 0, 0.1);
+  --surface-hover: rgba(0, 0, 0, 0.05);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --accent-color: #4f46e5;
+  --accent-glow: rgba(79, 70, 229, 0.2);
+  --accent-secondary: #d946ef;
+  --success-color: #059669;
+  --success-glow: rgba(5, 150, 105, 0.2);
+  --danger-color: #e11d48;
+  --danger-glow: rgba(225, 29, 72, 0.2);
 }
 
 * {
@@ -34,6 +50,7 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 #app {

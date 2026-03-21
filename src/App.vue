@@ -23,11 +23,15 @@ const connectionState = ref<ConnectState>("disconnected");
 const peerId = ref("");
 const inboxMsgs = ref<MessageItem[]>([]);
 const sentMsgs = ref<MessageItem[]>([]);
+const theme = ref(localStorage.getItem("peerbin_theme") || "dark");
 let p2p: OnlinePeer | null = null;
 let relay: GlobalRelay | null = null;
 
 // Initialization
 onMounted(async () => {
+  // Apply visual theme
+  document.documentElement.setAttribute("data-theme", theme.value);
+
   // Load draft from DB
   const savedCode = await loadSnippet(SNIPPET_ID);
   if (savedCode) {
@@ -62,6 +66,13 @@ onMounted(async () => {
 
   relay.init();
 });
+
+// Theme toggler logic
+const toggleTheme = () => {
+  theme.value = theme.value === "dark" ? "light" : "dark";
+  localStorage.setItem("peerbin_theme", theme.value);
+  document.documentElement.setAttribute("data-theme", theme.value);
+};
 
 // Draft autosave
 watch(code, (newCode) => {
@@ -109,10 +120,31 @@ const handleDeleteMessage = async (id: string) => {
   <main class="app-layout">
     <header class="app-header glass-panel">
       <div class="logo">
-        <span class="logo-icon">🔗</span>
+        <img
+          src="/logo.png"
+          alt="PeerBin Logo"
+          class="app-logo-img"
+          onerror="
+            this.style.display = 'none';
+            this.nextElementSibling.style.display = 'inline';
+          "
+        />
+        <span class="logo-icon fallback-icon" style="display: none">🔗</span>
         <h1>PeerBin</h1>
       </div>
-      <p class="tagline">Decentralized Snippet Messenger</p>
+
+      <div class="header-right">
+        <p class="tagline">Decentralized Snippet Messenger</p>
+        <button
+          class="btn btn-icon theme-toggle"
+          @click="toggleTheme"
+          :title="
+            theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'
+          "
+        >
+          {{ theme === "dark" ? "☀️" : "🌙" }}
+        </button>
+      </div>
     </header>
 
     <div class="main-content">
@@ -222,17 +254,55 @@ const handleDeleteMessage = async (id: string) => {
   gap: 0.75rem;
 }
 
-.logo-icon {
+.app-logo-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.logo-icon.fallback-icon {
   font-size: 1.8rem;
   filter: drop-shadow(0 0 8px var(--accent-color));
 }
 
 .logo h1 {
-  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  background: linear-gradient(
+    135deg,
+    var(--text-primary) 0%,
+    var(--accent-color) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 1.8rem;
   margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.theme-toggle {
+  font-size: 1.2rem;
+  padding: 0.4rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+}
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: rotate(15deg) scale(1.1);
+}
+
+[data-theme="light"] .logo h1 {
+  background: linear-gradient(
+    135deg,
+    var(--accent-color) 0%,
+    var(--accent-secondary) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .tagline {
@@ -304,7 +374,7 @@ const handleDeleteMessage = async (id: string) => {
 }
 
 .tab-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(100, 100, 100, 0.1);
   color: var(--text-primary);
 }
 
