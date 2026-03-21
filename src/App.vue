@@ -2,19 +2,16 @@
 import { ref, onMounted, watch } from "vue";
 import ConnectionPanel from "./components/ConnectionPanel.vue";
 import CodeEditor from "./components/CodeEditor.vue";
-import { P2PConnection } from "./utils/webrtc";
+import { OnlinePeer,  type ConnectState } from "./utils/peer";
 import { saveSnippet, loadSnippet } from "./utils/db";
 
 const SNIPPET_ID = "default-snippet";
 
 // State
 const code = ref("");
-const connectionState = ref<"disconnected" | "connecting" | "connected">(
-  "disconnected",
-);
-const localOffer = ref("");
-const localAnswer = ref("");
-let p2p: P2PConnection | null = null;
+const connectionState = ref<ConnectState>("disconnected");
+const peerId = ref("");
+let p2p: OnlinePeer | null = null;
 let ignoreNextWatch = false;
 
 // Initialization
@@ -25,8 +22,8 @@ onMounted(async () => {
     code.value = savedCode;
   }
 
-  // Setup P2P handlers
-  p2p = new P2PConnection({
+  // Setup PeerJS handling
+  p2p = new OnlinePeer({
     onStateChange: (state) => {
       connectionState.value = state;
     },
@@ -35,13 +32,13 @@ onMounted(async () => {
       code.value = receivedCode;
       saveSnippet(SNIPPET_ID, receivedCode);
     },
-    onLocalOffer: (offerBase64) => {
-      localOffer.value = offerBase64;
-    },
-    onLocalAnswer: (answerBase64) => {
-      localAnswer.value = answerBase64;
+    onIdGenerated: (id) => {
+      peerId.value = id;
     },
   });
+
+  // Initialize the peer server connection
+  p2p.init();
 });
 
 // Sync changes
@@ -58,27 +55,12 @@ watch(code, (newCode) => {
   }
 });
 
-// P2P Workflow Handlers
-const handleCreateOffer = async () => {
-  localOffer.value = "";
-  localAnswer.value = "";
-  await p2p?.createOffer();
-};
-
-const handleAcceptOffer = async (offerStr: string) => {
-  localOffer.value = ""; // Clean host flow state if re-used
-  localAnswer.value = "";
-  await p2p?.acceptOffer(offerStr);
-};
-
-const handleAcceptAnswer = async (answerStr: string) => {
-  await p2p?.acceptAnswer(answerStr);
+const handleConnect = (targetId: string) => {
+  p2p?.connectTo(targetId);
 };
 
 const handleDisconnect = () => {
   p2p?.disconnect();
-  localOffer.value = "";
-  localAnswer.value = "";
 };
 </script>
 
@@ -89,32 +71,28 @@ const handleDisconnect = () => {
         <span class="logo-icon">🔗</span>
         <h1>PeerBin</h1>
       </div>
-      <p class="tagline">Decentralized P2P Code Sharing</p>
+      <p class="tagline">Decentralized Online Code Sharing</p>
     </header>
 
     <div class="main-content">
       <div class="sidebar">
         <ConnectionPanel
           :connectionState="connectionState"
-          :localOffer="localOffer"
-          :localAnswer="localAnswer"
-          @createOffer="handleCreateOffer"
-          @acceptOffer="handleAcceptOffer"
-          @acceptAnswer="handleAcceptAnswer"
+          :peerId="peerId"
+          @connect="handleConnect"
           @disconnect="handleDisconnect"
         />
 
         <div class="info-panel glass-panel mt-4">
           <h3>How it works</h3>
           <p>
-            PeerBin connects two browsers directly using WebRTC. Because it uses
-            manual signaling, it works <strong>perfectly offline</strong>
-            on your local network!
+            PeerBin connects two browsers over the internet using PeerJS's
+            public signaling server.
           </p>
           <ul class="features">
             <li>✓ Auto-saves locally (IndexedDB)</li>
-            <li>✓ Zero-server P2P Syncing</li>
-            <li>✓ Private & Encrypted</li>
+            <li>✓ Uses Internet Signaling for easy connections</li>
+            <li>✓ Simple 5-Char Connect IDs</li>
           </ul>
         </div>
       </div>
