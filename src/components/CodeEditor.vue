@@ -96,7 +96,7 @@ const langInfo = computed(() => detectLanguage(props.modelValue));
 
 .editor-header {
   padding: 0.75rem 1rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--header-bg);
   border-bottom: 1px solid var(--surface-border);
   display: flex;
   justify-content: space-between;
@@ -142,7 +142,7 @@ const langInfo = computed(() => detectLanguage(props.modelValue));
 }
 
 .btn-disabled {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--btn-disabled);
   cursor: not-allowed;
   opacity: 0.5;
 }

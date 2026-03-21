@@ -288,10 +288,14 @@ const handleDeleteMessage = async (id: string) => {
   font-size: 1.2rem;
   padding: 0.4rem;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--btn-bg);
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 .theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--btn-hover-bg);
   transform: rotate(15deg) scale(1.1);
 }
 
@@ -302,6 +306,7 @@ const handleDeleteMessage = async (id: string) => {
     var(--accent-secondary) 100%
   );
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -392,13 +397,13 @@ const handleDeleteMessage = async (id: string) => {
 }
 
 .badge {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--badge-bg);
   padding: 0.1rem 0.5rem;
   border-radius: 12px;
   font-size: 0.75rem;
 }
 .tab-btn.active .badge {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--badge-active);
 }
 
 .tab-content {

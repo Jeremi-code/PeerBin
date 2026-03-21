@@ -133,7 +133,7 @@ const copyToClipboard = async (text: string) => {
   font-weight: 600;
   padding: 0.3rem 0.75rem;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--btn-bg);
   border: 1px solid var(--surface-border);
 }
 
@@ -173,7 +173,7 @@ const copyToClipboard = async (text: string) => {
 }
 
 .step-card {
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--card-bg);
   padding: 1rem;
   border-radius: 8px;
   border: 1px solid var(--surface-border);

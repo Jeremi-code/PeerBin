@@ -122,14 +122,14 @@ const copyToClipboard = async (text: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--header-bg);
   border-radius: 12px 12px 0 0;
 }
 
 .header h2 {
   font-size: 1.25rem;
   margin: 0;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .count {
@@ -151,7 +151,7 @@ const copyToClipboard = async (text: string) => {
 }
 
 .message-card {
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--card-bg);
   border: 1px solid var(--surface-border);
   border-radius: 8px;
   overflow: hidden;
@@ -159,7 +159,7 @@ const copyToClipboard = async (text: string) => {
 }
 .message-card:hover:not(.expanded) {
   border-color: rgba(255, 255, 255, 0.15);
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--card-hover);
 }
 .message-card.expanded {
   border-color: var(--accent-color);
@@ -199,7 +199,7 @@ const copyToClipboard = async (text: string) => {
 }
 
 .lang-pill {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--badge-active);
   color: var(--text-primary);
   font-size: 0.65rem;
   padding: 0.2rem 0.5rem;
@@ -236,14 +236,14 @@ const copyToClipboard = async (text: string) => {
 
 .card-content {
   border-top: 1px solid var(--surface-border);
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--content-bg);
   display: flex;
   flex-direction: column;
 }
 
 .code-viewer-header {
   padding: 0.5rem 1rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--code-header-bg);
   font-size: 0.8rem;
   color: var(--text-secondary);
   font-weight: 600;
@@ -270,7 +270,7 @@ const copyToClipboard = async (text: string) => {
   border-top: 1px dashed var(--surface-border);
   display: flex;
   justify-content: flex-end;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--header-bg);
 }
 
 .empty-state {
