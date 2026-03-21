@@ -2,57 +2,62 @@
 import { ref, onMounted, watch } from "vue";
 import ConnectionPanel from "./components/ConnectionPanel.vue";
 import CodeEditor from "./components/CodeEditor.vue";
-import { OnlinePeer,  type ConnectState } from "./utils/peer";
-import { saveSnippet, loadSnippet } from "./utils/db";
+import MessageList from "./components/MessageList.vue";
+import { OnlinePeer, type ConnectState } from "./utils/peer";
+import {
+  saveSnippet,
+  loadSnippet,
+  getMessages,
+  saveMessage,
+  deleteMessage,
+  type MessageItem,
+} from "./utils/db";
 
-const SNIPPET_ID = "default-snippet";
+const SNIPPET_ID = "draft-snippet";
 
 // State
+const currentTab = ref<"write" | "inbox" | "sent">("write");
 const code = ref("");
 const connectionState = ref<ConnectState>("disconnected");
 const peerId = ref("");
+const inboxMsgs = ref<MessageItem[]>([]);
+const sentMsgs = ref<MessageItem[]>([]);
 let p2p: OnlinePeer | null = null;
-let ignoreNextWatch = false;
 
 // Initialization
 onMounted(async () => {
-  // Load initial code from DB
+  // Load draft from DB
   const savedCode = await loadSnippet(SNIPPET_ID);
   if (savedCode) {
     code.value = savedCode;
   }
+
+  // Load messages
+  await fetchMessages();
 
   // Setup PeerJS handling
   p2p = new OnlinePeer({
     onStateChange: (state) => {
       connectionState.value = state;
     },
-    onCodeReceived: (receivedCode) => {
-      ignoreNextWatch = true;
-      code.value = receivedCode;
-      saveSnippet(SNIPPET_ID, receivedCode);
+    onCodeReceived: async (receivedCode) => {
+      // Received a message! Save it directly to inbox.
+      await saveMessage(receivedCode, "inbox");
+      await fetchMessages();
+      // Auto-switch to inbox if they are writing to show them the new message?
+      // Better to just let them see the badge/switch manually.
     },
     onIdGenerated: (id) => {
       peerId.value = id;
     },
   });
 
-  // Initialize the peer server connection
   p2p.init();
 });
 
-// Sync changes
+// Draft autosave
 watch(code, (newCode) => {
   saveSnippet(SNIPPET_ID, newCode);
-
-  if (ignoreNextWatch) {
-    ignoreNextWatch = false;
-    return;
-  }
-
-  if (p2p && connectionState.value === "connected") {
-    p2p.sendCode(newCode);
-  }
 });
 
 const handleConnect = (targetId: string) => {
@@ -61,6 +66,27 @@ const handleConnect = (targetId: string) => {
 
 const handleDisconnect = () => {
   p2p?.disconnect();
+};
+
+const fetchMessages = async () => {
+  inboxMsgs.value = await getMessages("inbox");
+  sentMsgs.value = await getMessages("sent");
+};
+
+const handleSendCode = async (content: string) => {
+  if (p2p && connectionState.value === "connected" && content.trim()) {
+    p2p.sendCode(content);
+    // Save to sent box
+    await saveMessage(content, "sent");
+    await fetchMessages();
+    // Switch to sent tab to confirm
+    currentTab.value = "sent";
+  }
+};
+
+const handleDeleteMessage = async (id: string) => {
+  await deleteMessage(id);
+  await fetchMessages();
 };
 </script>
 
@@ -71,7 +97,7 @@ const handleDisconnect = () => {
         <span class="logo-icon">🔗</span>
         <h1>PeerBin</h1>
       </div>
-      <p class="tagline">Decentralized Online Code Sharing</p>
+      <p class="tagline">Decentralized Snippet Messenger</p>
     </header>
 
     <div class="main-content">
@@ -84,21 +110,70 @@ const handleDisconnect = () => {
         />
 
         <div class="info-panel glass-panel mt-4">
-          <h3>How it works</h3>
+          <h3>P2P Messaging</h3>
           <p>
-            PeerBin connects two browsers over the internet using PeerJS's
-            public signaling server.
+            PeerBin is now a secure code messenger! Connect to a peer and swap
+            snippets seamlessly into each other's Inboxes.
           </p>
-          <ul class="features">
-            <li>✓ Auto-saves locally (IndexedDB)</li>
-            <li>✓ Uses Internet Signaling for easy connections</li>
-            <li>✓ Simple 5-Char Connect IDs</li>
-          </ul>
         </div>
       </div>
 
-      <div class="editor-area">
-        <CodeEditor v-model="code" />
+      <div class="workspace-area">
+        <div class="tabs-nav glass-panel">
+          <button
+            class="tab-btn"
+            :class="{ active: currentTab === 'write' }"
+            @click="currentTab = 'write'"
+          >
+            ✍️ Sending Now <span v-if="code.trim()" class="draft-dot"></span>
+          </button>
+          <button
+            class="tab-btn"
+            :class="{ active: currentTab === 'inbox' }"
+            @click="currentTab = 'inbox'"
+          >
+            📥 Inbox
+            <span class="badge" v-if="inboxMsgs.length">{{
+              inboxMsgs.length
+            }}</span>
+          </button>
+          <button
+            class="tab-btn"
+            :class="{ active: currentTab === 'sent' }"
+            @click="currentTab = 'sent'"
+          >
+            📤 Sent
+            <span class="badge" v-if="sentMsgs.length">{{
+              sentMsgs.length
+            }}</span>
+          </button>
+        </div>
+
+        <div class="tab-content" v-show="currentTab === 'write'">
+          <CodeEditor
+            v-model="code"
+            :isConnected="connectionState === 'connected'"
+            @sendCode="handleSendCode"
+          />
+        </div>
+
+        <div class="tab-content" v-show="currentTab === 'inbox'">
+          <MessageList
+            title="Inbox"
+            emptyMessage="Your inbox is empty. Waiting for peers to send you code!"
+            :messages="inboxMsgs"
+            @delete="handleDeleteMessage"
+          />
+        </div>
+
+        <div class="tab-content" v-show="currentTab === 'sent'">
+          <MessageList
+            title="Sent Snippets"
+            emptyMessage="You haven't sent any snippets yet."
+            :messages="sentMsgs"
+            @delete="handleDeleteMessage"
+          />
+        </div>
       </div>
     </div>
   </main>
@@ -156,17 +231,10 @@ const handleDisconnect = () => {
 }
 
 .sidebar {
-  width: 380px;
+  width: 350px;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  overflow-y: auto;
-}
-
-.editor-area {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
 }
 
 .info-panel {
@@ -183,16 +251,71 @@ const handleDisconnect = () => {
   font-size: 0.9rem;
   color: var(--text-secondary);
   line-height: 1.5;
-  margin-bottom: 1rem;
 }
 
-.features {
-  list-style: none;
-  font-size: 0.85rem;
-  color: var(--text-primary);
+.workspace-area {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+
+.tabs-nav {
+  display: flex;
+  padding: 0.5rem;
   gap: 0.5rem;
+  border-radius: 12px;
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  background: var(--accent-color);
+  color: #fff;
+  box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.draft-dot {
+  width: 6px;
+  height: 6px;
+  background: #ffbd2e;
+  border-radius: 50%;
+}
+
+.badge {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.1rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+.tab-btn.active .badge {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tab-content {
+  flex: 1;
+  min-height: 0;
 }
 
 .mt-4 {
