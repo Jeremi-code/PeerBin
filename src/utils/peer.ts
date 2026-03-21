@@ -4,27 +4,21 @@ export type ConnectState = "disconnected" | "connecting" | "connected";
 
 interface PeerEvents {
   onStateChange: (state: ConnectState) => void;
-  onCodeReceived: (code: string) => void;
+  onCodeReceived: (code: string, isGlobal: boolean) => void;
   onIdGenerated: (id: string) => void;
 }
 
 export class OnlinePeer {
   private peer: Peer | null = null;
-  private conn: DataConnection | null = null;
+  private conns: Map<string, DataConnection> = new Map();
   private events: PeerEvents;
 
   constructor(events: PeerEvents) {
     this.events = events;
   }
 
-  /**
-   * Initialize the PeerJS client to connect to the public cloud signaling server.
-   */
   public init() {
-    // Generate a simple, readable 5-character ID
     const randomId = Math.random().toString(36).substring(2, 7).toUpperCase();
-
-    // We use the default PeerJS cloud server for signaling over the internet
     this.peer = new Peer(randomId);
 
     this.peer.on("open", (id) => {
@@ -33,69 +27,70 @@ export class OnlinePeer {
     });
 
     this.peer.on("connection", (connection) => {
-      // Someone connected to us
       this.setupConnection(connection);
     });
 
     this.peer.on("error", (err) => {
       console.error("PeerJS error:", err);
-      this.events.onStateChange("disconnected");
-      if (this.conn) this.conn.close();
     });
   }
 
   private setupConnection(connection: DataConnection) {
-    this.conn = connection;
+    this.conns.set(connection.peer, connection);
     this.events.onStateChange("connecting");
 
-    this.conn.on("open", () => {
+    connection.on("open", () => {
       this.events.onStateChange("connected");
     });
 
-    this.conn.on("data", (data) => {
+    connection.on("data", (data) => {
       if (typeof data === "string") {
-        this.events.onCodeReceived(data);
+        try {
+          const parsed = JSON.parse(data);
+          this.events.onCodeReceived(parsed.content, parsed.isGlobal);
+        } catch {
+          // Fallback for legacy raw text
+          this.events.onCodeReceived(data, false);
+        }
       }
     });
 
-    this.conn.on("close", () => {
-      this.events.onStateChange("disconnected");
-      this.conn = null;
+    connection.on("close", () => {
+      this.conns.delete(connection.peer);
+      if (this.conns.size === 0) {
+        this.events.onStateChange("disconnected");
+      }
     });
 
-    this.conn.on("error", (err) => {
+    connection.on("error", (err) => {
       console.error("Connection error", err);
-      this.events.onStateChange("disconnected");
-      this.conn = null;
+      this.conns.delete(connection.peer);
+      if (this.conns.size === 0) {
+        this.events.onStateChange("disconnected");
+      }
     });
   }
 
-  /**
-   * Connect to another PeerJS client using their ID.
-   */
   public connectTo(targetId: string) {
     if (!this.peer) return;
     const connection = this.peer.connect(targetId.toUpperCase());
     this.setupConnection(connection);
   }
 
-  /**
-   * Send code updates directly across the internet.
-   */
-  public sendCode(code: string) {
-    if (this.conn && this.conn.open) {
-      this.conn.send(code);
+  public sendCode(code: string, isGlobal: boolean) {
+    const payload = JSON.stringify({ content: code, isGlobal });
+    for (const [_, conn] of this.conns.entries()) {
+      if (conn.open) {
+        conn.send(payload);
+      }
     }
   }
 
-  /**
-   * Disconnect the current data connection but keep the peer open for new ones.
-   */
   public disconnect() {
-    if (this.conn) {
-      this.conn.close();
-      this.conn = null;
+    for (const [_, conn] of this.conns.entries()) {
+      conn.close();
     }
+    this.conns.clear();
     this.events.onStateChange("disconnected");
   }
 }

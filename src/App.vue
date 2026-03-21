@@ -4,6 +4,7 @@ import ConnectionPanel from "./components/ConnectionPanel.vue";
 import CodeEditor from "./components/CodeEditor.vue";
 import MessageList from "./components/MessageList.vue";
 import { OnlinePeer, type ConnectState } from "./utils/peer";
+import { GlobalRelay } from "./utils/mqtt";
 import {
   saveSnippet,
   loadSnippet,
@@ -23,6 +24,7 @@ const peerId = ref("");
 const inboxMsgs = ref<MessageItem[]>([]);
 const sentMsgs = ref<MessageItem[]>([]);
 let p2p: OnlinePeer | null = null;
+let relay: GlobalRelay | null = null;
 
 // Initialization
 onMounted(async () => {
@@ -35,17 +37,14 @@ onMounted(async () => {
   // Load messages
   await fetchMessages();
 
-  // Setup PeerJS handling
+  // Setup standard Direct PeerJS handling
   p2p = new OnlinePeer({
     onStateChange: (state) => {
       connectionState.value = state;
     },
-    onCodeReceived: async (receivedCode) => {
-      // Received a message! Save it directly to inbox.
-      await saveMessage(receivedCode, "inbox");
+    onCodeReceived: async (receivedCode, isGlobal) => {
+      await saveMessage(receivedCode, "inbox", isGlobal);
       await fetchMessages();
-      // Auto-switch to inbox if they are writing to show them the new message?
-      // Better to just let them see the badge/switch manually.
     },
     onIdGenerated: (id) => {
       peerId.value = id;
@@ -53,6 +52,15 @@ onMounted(async () => {
   });
 
   p2p.init();
+
+  // Setup Anonymous Global Relay handling
+  relay = new GlobalRelay(async (receivedCode) => {
+    // When a global message lands from the worldwide channel!
+    await saveMessage(receivedCode, "inbox", true);
+    await fetchMessages();
+  });
+
+  relay.init();
 });
 
 // Draft autosave
@@ -73,14 +81,21 @@ const fetchMessages = async () => {
   sentMsgs.value = await getMessages("sent");
 };
 
-const handleSendCode = async (content: string) => {
-  if (p2p && connectionState.value === "connected" && content.trim()) {
-    p2p.sendCode(content);
-    // Save to sent box
-    await saveMessage(content, "sent");
-    await fetchMessages();
-    // Switch to sent tab to confirm
-    currentTab.value = "sent";
+const handleSendCode = async (content: string, isGlobal: boolean) => {
+  if (content.trim()) {
+    if (isGlobal) {
+      // Broadcast over the worldwide MQTT channel!
+      relay?.broadcast(content);
+      await saveMessage(content, "sent", true);
+      await fetchMessages();
+      currentTab.value = "sent";
+    } else if (p2p && connectionState.value === "connected") {
+      // Direct send to explicitly connected PeerJS connections
+      p2p.sendCode(content, false);
+      await saveMessage(content, "sent", false);
+      await fetchMessages();
+      currentTab.value = "sent";
+    }
   }
 };
 
@@ -114,6 +129,9 @@ const handleDeleteMessage = async (id: string) => {
           <p>
             PeerBin is now a secure code messenger! Connect to a peer and swap
             snippets seamlessly into each other's Inboxes.
+            <br /><br />
+            Hit <strong>Global Broadcast</strong> to send a snippet anonymously
+            to <em>everyone currently using this app worldwide!</em>
           </p>
         </div>
       </div>

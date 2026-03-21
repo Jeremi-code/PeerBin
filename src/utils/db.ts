@@ -1,6 +1,6 @@
 export const DB_NAME = "PeerBinDB";
-export const DB_VERSION = 3; // Incremented for message store
-export const STORE_NAME = "snippets"; // for active editor autosave
+export const DB_VERSION = 4; // Incremented for global flag schema
+export const STORE_NAME = "snippets";
 export const MSG_STORE_NAME = "messages";
 
 export interface MessageItem {
@@ -8,6 +8,7 @@ export interface MessageItem {
   type: "inbox" | "sent";
   content: string;
   timestamp: number;
+  isGlobal?: boolean;
 }
 
 /**
@@ -28,10 +29,6 @@ function openDB(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains(MSG_STORE_NAME)) {
         db.createObjectStore(MSG_STORE_NAME, { keyPath: "id" });
       }
-      // Clean up old history if it existed
-      if (db.objectStoreNames.contains("history")) {
-        db.deleteObjectStore("history");
-      }
     };
   });
 }
@@ -43,10 +40,11 @@ export async function saveSnippet(id: string, content: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([STORE_NAME], "readwrite");
     const store = transaction.objectStore(STORE_NAME);
-    const request = store.put({ id, content, updatedAt: Date.now() });
+    store.put({ id, content, updatedAt: Date.now() });
 
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
+    // Explicitly resolve on transaction complete to guarantee persistence before refresh!
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
   });
 }
 
@@ -70,21 +68,24 @@ export async function loadSnippet(id: string): Promise<string | null> {
 export async function saveMessage(
   content: string,
   type: "inbox" | "sent",
+  isGlobal: boolean = false,
 ): Promise<MessageItem> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([MSG_STORE_NAME], "readwrite");
     const store = transaction.objectStore(MSG_STORE_NAME);
     const item: MessageItem = {
-      id: Date.now().toString(),
+      id: Date.now().toString() + Math.random().toString(36).substring(2, 5), // Guarantee unique ID for fast consecutive inserts
       type,
       content,
       timestamp: Date.now(),
+      isGlobal,
     };
-    const request = store.put(item);
+    store.put(item);
 
-    request.onsuccess = () => resolve(item);
-    request.onerror = () => reject(request.error);
+    // Explicitly resolve on transaction complete to guarantee persistence before refresh!
+    transaction.oncomplete = () => resolve(item);
+    transaction.onerror = () => reject(transaction.error);
   });
 }
 
@@ -112,9 +113,9 @@ export async function deleteMessage(id: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([MSG_STORE_NAME], "readwrite");
     const store = transaction.objectStore(MSG_STORE_NAME);
-    const request = store.delete(id);
+    store.delete(id);
 
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
   });
 }

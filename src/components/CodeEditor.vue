@@ -6,7 +6,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
-  (e: "sendCode", value: string): void;
+  (e: "sendCode", value: string, isGlobal: boolean): void;
 }>();
 
 const handleInput = (event: Event) => {
@@ -51,9 +51,18 @@ const handleKeydown = (event: KeyboardEvent) => {
           class="btn btn-sm"
           :class="props.isConnected ? 'btn-primary' : 'btn-disabled'"
           :disabled="!props.isConnected || !props.modelValue.trim()"
-          @click="emit('sendCode', props.modelValue)"
+          @click="emit('sendCode', props.modelValue, false)"
+          title="Send specifically to Peer"
         >
-          🚀 Send to Peer
+          🚀 Direct Send
+        </button>
+        <button
+          class="btn btn-sm btn-warning"
+          :disabled="!props.modelValue.trim()"
+          @click="emit('sendCode', props.modelValue, true)"
+          title="Broadcast to Global Channel"
+        >
+          🌍 Global Broadcast
         </button>
       </div>
     </div>
@@ -62,7 +71,7 @@ const handleKeydown = (event: KeyboardEvent) => {
       :value="props.modelValue"
       @input="handleInput"
       @keydown="handleKeydown"
-      placeholder="// Write your code snippet here.&#10;// When ready, click 'Send to Peer' to drop it into their Inbox!"
+      placeholder="// Write your code snippet here.&#10;// When ready, click 'Direct Send' or 'Global Broadcast' to drop it into their Inbox!"
       spellcheck="false"
     ></textarea>
   </div>
@@ -121,6 +130,16 @@ const handleKeydown = (event: KeyboardEvent) => {
   background: rgba(255, 255, 255, 0.05);
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.btn-warning {
+  background: var(--accent-secondary);
+  border-color: var(--accent-secondary);
+  box-shadow: 0 0 15px rgba(232, 28, 255, 0.4);
+}
+.btn-warning:hover:not(:disabled) {
+  background: #f04dff;
+  box-shadow: 0 0 25px rgba(232, 28, 255, 0.6);
 }
 
 .editor-textarea {

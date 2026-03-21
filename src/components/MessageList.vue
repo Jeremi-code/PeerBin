@@ -61,6 +61,7 @@ const copyToClipboard = async (text: string) => {
               props.title === "Inbox" ? "📥" : "📤"
             }}</span>
             <span class="date">{{ formatDate(msg.timestamp) }}</span>
+            <span class="chip-global" v-if="msg.isGlobal">🌍 GLOBAL</span>
           </div>
           <code class="preview" v-if="expandedId !== msg.id">{{
             getPreview(msg.content)
@@ -167,7 +168,7 @@ const copyToClipboard = async (text: string) => {
 .card-meta {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   flex-shrink: 0;
 }
 
@@ -175,6 +176,17 @@ const copyToClipboard = async (text: string) => {
   font-size: 0.85rem;
   color: var(--text-secondary);
   font-weight: 500;
+}
+
+.chip-global {
+  background: rgba(232, 28, 255, 0.2);
+  color: #f04dff;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(232, 28, 255, 0.4);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .preview {
