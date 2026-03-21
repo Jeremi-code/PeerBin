@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { MessageItem } from "../utils/db";
+import { detectLanguage, highlightCode } from "../utils/language";
 
 const props = defineProps<{
   messages: MessageItem[];
@@ -24,7 +25,7 @@ const formatDate = (ts: number) => {
 };
 
 const getPreview = (content: string) => {
-  const firstLine = content.split("\n")[0].trim();
+  const firstLine = (content.split("\n")[0] || "").trim();
   return firstLine.length > 50 ? firstLine.substring(0, 50) + "..." : firstLine;
 };
 
@@ -62,6 +63,9 @@ const copyToClipboard = async (text: string) => {
             }}</span>
             <span class="date">{{ formatDate(msg.timestamp) }}</span>
             <span class="chip-global" v-if="msg.isGlobal">🌍 GLOBAL</span>
+            <span class="lang-pill" v-if="expandedId !== msg.id">{{
+              detectLanguage(msg.content).name
+            }}</span>
           </div>
           <code class="preview" v-if="expandedId !== msg.id">{{
             getPreview(msg.content)
@@ -78,11 +82,16 @@ const copyToClipboard = async (text: string) => {
         </div>
 
         <div class="card-content" v-if="expandedId === msg.id">
-          <textarea
-            class="readonly-editor"
-            readonly
-            :value="msg.content"
-          ></textarea>
+          <div class="code-viewer-header">
+            <span
+              >{{ detectLanguage(msg.content).icon }}
+              {{ detectLanguage(msg.content).name }}</span
+            >
+          </div>
+          <div class="code-scroll-area">
+            <!-- Render highlighted automatic HTML via highlight.js -->
+            <pre><code class="hljs" v-html="highlightCode(msg.content)"></code></pre>
+          </div>
           <div class="content-actions">
             <button class="btn btn-sm" @click="copyToClipboard(msg.content)">
               📋 Copy Source
@@ -189,6 +198,15 @@ const copyToClipboard = async (text: string) => {
   letter-spacing: 0.5px;
 }
 
+.lang-pill {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
 .preview {
   flex: 1;
   font-family: "Fira Code", monospace;
@@ -210,9 +228,10 @@ const copyToClipboard = async (text: string) => {
   font-size: 0.8rem;
   background: transparent;
   border: none;
+  color: var(--text-primary);
 }
 .delete-btn:hover {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.5);
 }
 
 .card-content {
@@ -222,17 +241,27 @@ const copyToClipboard = async (text: string) => {
   flex-direction: column;
 }
 
-.readonly-editor {
-  width: 100%;
-  height: 250px;
-  resize: vertical;
-  background: transparent;
-  border: none;
+.code-viewer-header {
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.code-scroll-area {
+  max-height: 350px;
+  overflow-y: auto;
   padding: 1rem;
+}
+.code-scroll-area pre {
+  margin: 0;
+  background: transparent;
+}
+.code-scroll-area code {
   font-family: "Fira Code", monospace;
   font-size: 0.95rem;
-  color: var(--text-primary);
-  outline: none;
   line-height: 1.5;
 }
 

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+@import 'highlight.js/styles/atom-one-dark.css';
 
 :root {
   --bg-color: #0c0d14;

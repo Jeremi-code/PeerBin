@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { detectLanguage } from "../utils/language";
+
 const props = defineProps<{
   modelValue: string;
   isConnected: boolean;
@@ -32,6 +35,8 @@ const handleKeydown = (event: KeyboardEvent) => {
     }, 0);
   }
 };
+
+const langInfo = computed(() => detectLanguage(props.modelValue));
 </script>
 
 <template>
@@ -43,7 +48,10 @@ const handleKeydown = (event: KeyboardEvent) => {
           <span class="control minimize"></span>
           <span class="control maximize"></span>
         </div>
-        <div class="filename">draft_snippet.ts</div>
+        <div class="filename">
+          <span class="lang-icon">{{ langInfo.icon }}</span>
+          snippet.{{ langInfo.extension }}
+        </div>
       </div>
 
       <div class="header-actions">
@@ -71,7 +79,7 @@ const handleKeydown = (event: KeyboardEvent) => {
       :value="props.modelValue"
       @input="handleInput"
       @keydown="handleKeydown"
-      placeholder="// Write your code snippet here.&#10;// When ready, click 'Direct Send' or 'Global Broadcast' to drop it into their Inbox!"
+      placeholder="// Write your code snippet here.&#10;// We automatically detect your language!&#10;// When ready, click 'Direct Send' or 'Global Broadcast' to route it."
       spellcheck="false"
     ></textarea>
   </div>
@@ -118,7 +126,14 @@ const handleKeydown = (event: KeyboardEvent) => {
 .filename {
   font-family: "Fira Code", monospace;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.lang-icon {
+  font-size: 1rem;
 }
 
 .header-actions {
