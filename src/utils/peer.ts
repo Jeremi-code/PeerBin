@@ -20,6 +20,10 @@ export class OnlinePeer {
   public init() {
     const randomId = Math.random().toString(36).substring(2, 7).toUpperCase();
     this.peer = new Peer(randomId, {
+      host: "0.peerjs.com",
+      port: 443,
+      secure: true,
+      debug: 2, // Helps identify connection issues in console
       config: {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
@@ -33,8 +37,14 @@ export class OnlinePeer {
     });
 
     this.peer.on("open", (id) => {
+      console.log("🟢 PeerJS signaling connection opened with ID:", id);
       this.events.onIdGenerated(id);
       this.events.onStateChange("disconnected");
+    });
+
+    this.peer.on("disconnected", () => {
+      console.warn("🟡 PeerJS disconnected from signaling server. Attempting to reconnect...");
+      this.peer?.reconnect();
     });
 
     this.peer.on("connection", (connection) => {
@@ -46,8 +56,9 @@ export class OnlinePeer {
       if (err.type === "unavailable-id") {
         console.warn("⚠️ This Peer ID is already taken. Generating a new one...");
         this.init();
-      } else if (err.type === "network") {
-        console.error("📡 Network error: Check your internet connection or if PeerJS server is down.");
+      } else if (err.type === "network" || err.type === "server-error") {
+        console.error("📡 Signaling error: Attempting full reset in 5 seconds...");
+        setTimeout(() => this.init(), 5000);
       } else if (err.type === "peer-unavailable") {
         console.error("🚫 Target peer is not online or ID is incorrect.");
       }
