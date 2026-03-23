@@ -19,7 +19,18 @@ export class OnlinePeer {
 
   public init() {
     const randomId = Math.random().toString(36).substring(2, 7).toUpperCase();
-    this.peer = new Peer(randomId);
+    this.peer = new Peer(randomId, {
+      config: {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:stun1.l.google.com:19302" },
+          { urls: "stun:stun2.l.google.com:19302" },
+          { urls: "stun:stun3.l.google.com:19302" },
+          { urls: "stun:stun4.l.google.com:19302" },
+          { urls: "stun:stun.stunprotocol.org:3478" },
+        ],
+      },
+    });
 
     this.peer.on("open", (id) => {
       this.events.onIdGenerated(id);
