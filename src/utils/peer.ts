@@ -31,7 +31,15 @@ export class OnlinePeer {
     });
 
     this.peer.on("error", (err) => {
-      console.error("PeerJS error:", err);
+      console.error("❌ PeerJS error:", err.type, err);
+      if (err.type === "unavailable-id") {
+        console.warn("⚠️ This Peer ID is already taken. Generating a new one...");
+        this.init();
+      } else if (err.type === "network") {
+        console.error("📡 Network error: Check your internet connection or if PeerJS server is down.");
+      } else if (err.type === "peer-unavailable") {
+        console.error("🚫 Target peer is not online or ID is incorrect.");
+      }
     });
   }
 
