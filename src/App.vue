@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from "vue";
 import ConnectionPanel from "./components/ConnectionPanel.vue";
 import CodeEditor from "./components/CodeEditor.vue";
 import MessageList from "./components/MessageList.vue";
+import Toast from "./components/Toast.vue";
 import { OnlinePeer, type ConnectState } from "./utils/peer";
 import { GlobalRelay } from "./utils/mqtt";
 import {
@@ -107,6 +108,7 @@ const handleDeleteMessage = async (id: string) => {
 </script>
 
 <template>
+  <Toast />
   <main class="app-layout">
     <header class="app-header glass-panel">
       <div class="logo">
