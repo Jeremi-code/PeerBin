@@ -23,15 +23,33 @@ export class OnlinePeer {
       host: "0.peerjs.com",
       port: 443,
       secure: true,
-      debug: 2, // Helps identify connection issues in console
+      debug: 2,
       config: {
         iceServers: [
+          // STUN servers — discover public IP for direct/NAT traversal
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:stun1.l.google.com:19302" },
           { urls: "stun:stun2.l.google.com:19302" },
           { urls: "stun:stun3.l.google.com:19302" },
           { urls: "stun:stun4.l.google.com:19302" },
           { urls: "stun:stun.stunprotocol.org:3478" },
+          // TURN relay servers — essential fallback when STUN/direct fails
+          // (covers strict NAT, firewalls, and same-LAN routing edge cases)
+          {
+            urls: "turn:openrelay.metered.ca:80",
+            username: "openrelayproject",
+            credential: "openrelayproject",
+          },
+          {
+            urls: "turn:openrelay.metered.ca:443",
+            username: "openrelayproject",
+            credential: "openrelayproject",
+          },
+          {
+            urls: "turn:openrelay.metered.ca:443?transport=tcp",
+            username: "openrelayproject",
+            credential: "openrelayproject",
+          },
         ],
       },
     });

@@ -2,59 +2,75 @@
 @import 'highlight.js/styles/atom-one-dark.css';
 
 :root, [data-theme="dark"] {
-  --bg-color: #0c0d14;
-  --surface-color: rgba(21, 23, 35, 0.6);
-  --surface-border: rgba(255, 255, 255, 0.08);
-  --surface-hover: rgba(255, 255, 255, 0.04);
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --accent-color: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.4);
-  --accent-secondary: #e81cff;
+  /* Thunderbird palette */
+  --accent-color: #e8654b;
+  --accent-hover: #d44a2e;
+  --accent-deep: #b93d24;
+  --accent-glow: rgba(232, 101, 75, 0.4);
+  --accent-secondary: #f8b6a9;
+  --accent-secondary-glow: rgba(248, 182, 169, 0.3);
+
+  --bg-color: #130905;
+  --surface-color: rgba(50, 18, 8, 0.55);
+  --surface-border: rgba(232, 101, 75, 0.14);
+  --surface-hover: rgba(232, 101, 75, 0.06);
+  --text-primary: #fdf5f3;
+  --text-secondary: #c97b68;
+
   --success-color: #10b981;
   --success-glow: rgba(16, 185, 129, 0.4);
   --danger-color: #f43f5e;
   --danger-glow: rgba(244, 63, 94, 0.4);
 
-  --input-bg: rgba(0, 0, 0, 0.3);
-  --btn-bg: rgba(255, 255, 255, 0.05);
-  --btn-hover-bg: rgba(255, 255, 255, 0.15);
-  --btn-disabled: rgba(255, 255, 255, 0.05);
-  --header-bg: rgba(0, 0, 0, 0.2);
-  --card-bg: rgba(0, 0, 0, 0.25);
-  --card-hover: rgba(0, 0, 0, 0.35);
-  --content-bg: rgba(0, 0, 0, 0.5); /* Code viewer wrapper */
-  --code-header-bg: rgba(0, 0, 0, 0.8);
-  --badge-bg: rgba(0, 0, 0, 0.3);
-  --badge-active: rgba(255, 255, 255, 0.2);
+  --input-bg: rgba(66, 22, 13, 0.5);
+  --btn-bg: rgba(232, 101, 75, 0.08);
+  --btn-hover-bg: rgba(232, 101, 75, 0.18);
+  --btn-disabled: rgba(232, 101, 75, 0.05);
+  --header-bg: rgba(40, 14, 6, 0.5);
+  --card-bg: rgba(40, 14, 6, 0.45);
+  --card-hover: rgba(60, 22, 10, 0.65);
+  --content-bg: rgba(13, 5, 2, 0.75);
+  --code-header-bg: rgba(10, 4, 1, 0.92);
+  --badge-bg: rgba(232, 101, 75, 0.15);
+  --badge-active: rgba(248, 182, 169, 0.2);
+
+  /* Dot grid pattern color */
+  --dot-color: rgba(232, 101, 75, 0.13);
 }
 
 [data-theme="light"] {
-  --bg-color: #f1f5f9;
-  --surface-color: rgba(255, 255, 255, 0.6);
-  --surface-border: rgba(0, 0, 0, 0.1);
-  --surface-hover: rgba(0, 0, 0, 0.05);
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --accent-color: #4f46e5;
-  --accent-glow: rgba(79, 70, 229, 0.2);
-  --accent-secondary: #d946ef;
+  --accent-color: #d44a2e;
+  --accent-hover: #b93d24;
+  --accent-deep: #943320;
+  --accent-glow: rgba(212, 74, 46, 0.25);
+  --accent-secondary: #e8654b;
+  --accent-secondary-glow: rgba(232, 101, 75, 0.2);
+
+  --bg-color: #fdf5f3;
+  --surface-color: rgba(255, 255, 255, 0.78);
+  --surface-border: rgba(212, 74, 46, 0.14);
+  --surface-hover: rgba(212, 74, 46, 0.05);
+  --text-primary: #42160d;
+  --text-secondary: #943320;
+
   --success-color: #059669;
   --success-glow: rgba(5, 150, 105, 0.2);
   --danger-color: #e11d48;
   --danger-glow: rgba(225, 29, 72, 0.2);
 
-  --input-bg: rgba(255, 255, 255, 0.6);
-  --btn-bg: rgba(0, 0, 0, 0.05);
-  --btn-hover-bg: rgba(0, 0, 0, 0.12);
-  --btn-disabled: rgba(0, 0, 0, 0.05);
-  --header-bg: rgba(255, 255, 255, 0.5);
-  --card-bg: rgba(255, 255, 255, 0.5);
-  --card-hover: rgba(255, 255, 255, 0.8);
-  --content-bg: #282c34; /* Keep snippet background dark in light mode to preserve Atom Dark syntax highlighting visibility */
-  --code-header-bg: #1e2227; 
-  --badge-bg: rgba(0, 0, 0, 0.1);
-  --badge-active: rgba(0, 0, 0, 0.25);
+  --input-bg: rgba(255, 255, 255, 0.85);
+  --btn-bg: rgba(212, 74, 46, 0.08);
+  --btn-hover-bg: rgba(212, 74, 46, 0.15);
+  --btn-disabled: rgba(212, 74, 46, 0.05);
+  --header-bg: rgba(253, 231, 227, 0.75);
+  --card-bg: rgba(253, 231, 227, 0.65);
+  --card-hover: rgba(253, 231, 227, 0.95);
+  --content-bg: #282c34;
+  --code-header-bg: #1e2227;
+  --badge-bg: rgba(212, 74, 46, 0.1);
+  --badge-active: rgba(212, 74, 46, 0.2);
+
+  --dot-color: rgba(212, 74, 46, 0.1);
 }
 
 * {
@@ -66,9 +82,12 @@
 body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-color);
+  /* Dot grid pattern (like did-exit.netlify.app) */
   background-image:
-    radial-gradient(circle at 10% 40%, rgba(99, 102, 241, 0.08), transparent 20%),
-    radial-gradient(circle at 90% 60%, rgba(232, 28, 255, 0.08), transparent 25%);
+    radial-gradient(circle, var(--dot-color) 1px, transparent 1px),
+    radial-gradient(ellipse at 5% 95%, rgba(185, 61, 36, 0.22), transparent 35%),
+    radial-gradient(ellipse at 95% 5%, rgba(232, 101, 75, 0.1), transparent 30%);
+  background-size: 22px 22px, 100% 100%, 100% 100%;
   color: var(--text-primary);
   min-height: 100vh;
   margin: 0;
@@ -87,11 +106,11 @@ body {
 /* Glassmorphism Panes */
 .glass-panel {
   background: var(--surface-color);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--surface-border);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px 0 rgba(66, 22, 13, 0.3), inset 0 1px 0 rgba(248, 182, 169, 0.07);
 }
 
 /* Typography */
@@ -130,25 +149,33 @@ h1, h2, h3, h4 {
 
 .btn:disabled {
   background: var(--btn-disabled);
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
   transform: none;
   border-color: var(--surface-border);
 }
 
+.btn-sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  border-radius: 7px;
+}
+
 .btn-primary {
   background: var(--accent-color);
   border-color: var(--accent-color);
-  box-shadow: 0 0 15px var(--accent-glow);
+  color: #fff;
+  box-shadow: 0 0 18px var(--accent-glow);
 }
 .btn-primary:hover:not(:disabled) {
-  background: #7174fa;
-  box-shadow: 0 0 25px var(--accent-glow);
+  background: var(--accent-hover);
+  box-shadow: 0 0 28px var(--accent-glow);
 }
 
 .btn-success {
   background: var(--success-color);
   border-color: var(--success-color);
+  color: #fff;
   box-shadow: 0 0 15px var(--success-glow);
 }
 .btn-success:hover:not(:disabled) {
@@ -159,11 +186,25 @@ h1, h2, h3, h4 {
 .btn-danger {
   background: var(--danger-color);
   border-color: var(--danger-color);
+  color: #fff;
   box-shadow: 0 0 15px var(--danger-glow);
 }
 .btn-danger:hover:not(:disabled) {
   background: #fb6f84;
   box-shadow: 0 0 25px var(--danger-glow);
+}
+
+/* Warm secondary button */
+.btn-warm {
+  background: rgba(248, 182, 169, 0.12);
+  border-color: rgba(248, 182, 169, 0.35);
+  color: var(--accent-secondary);
+  box-shadow: 0 0 14px rgba(248, 182, 169, 0.15);
+}
+.btn-warm:hover:not(:disabled) {
+  background: rgba(248, 182, 169, 0.22);
+  border-color: var(--accent-secondary);
+  box-shadow: 0 0 22px rgba(248, 182, 169, 0.3);
 }
 
 /* Inputs */
@@ -182,17 +223,17 @@ input[type="text"], textarea {
 
 input[type="text"]:focus, textarea:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 3px rgba(232, 101, 75, 0.18);
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+  animation: fadeIn 0.35s ease-out forwards;
 }
 
 @keyframes pulse {
@@ -207,17 +248,19 @@ input[type="text"]:focus, textarea:focus {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent; 
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08); 
-  border-radius: 5px;
-  border: 2px solid var(--bg-color); /* fake padding */
+  background: rgba(232, 101, 75, 0.2);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2); 
+  background: rgba(232, 101, 75, 0.4);
+  background-clip: content-box;
 }

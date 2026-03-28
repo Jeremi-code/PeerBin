@@ -29,19 +29,15 @@ let relay: GlobalRelay | null = null;
 
 // Initialization
 onMounted(async () => {
-  // Apply visual theme
   document.documentElement.setAttribute("data-theme", theme.value);
 
-  // Load draft from DB
   const savedCode = await loadSnippet(SNIPPET_ID);
   if (savedCode) {
     code.value = savedCode;
   }
 
-  // Load messages
   await fetchMessages();
 
-  // Setup standard Direct PeerJS handling
   p2p = new OnlinePeer({
     onStateChange: (state) => {
       connectionState.value = state;
@@ -57,9 +53,7 @@ onMounted(async () => {
 
   p2p.init();
 
-  // Setup Anonymous Global Relay handling
   relay = new GlobalRelay(async (receivedCode) => {
-    // When a global message lands from the worldwide channel!
     await saveMessage(receivedCode, "inbox", true);
     await fetchMessages();
   });
@@ -67,14 +61,12 @@ onMounted(async () => {
   relay.init();
 });
 
-// Theme toggler logic
 const toggleTheme = () => {
   theme.value = theme.value === "dark" ? "light" : "dark";
   localStorage.setItem("peerbin_theme", theme.value);
   document.documentElement.setAttribute("data-theme", theme.value);
 };
 
-// Draft autosave
 watch(code, (newCode) => {
   saveSnippet(SNIPPET_ID, newCode);
 });
@@ -95,13 +87,11 @@ const fetchMessages = async () => {
 const handleSendCode = async (content: string, isGlobal: boolean) => {
   if (content.trim()) {
     if (isGlobal) {
-      // Broadcast over the worldwide MQTT channel!
       relay?.broadcast(content);
       await saveMessage(content, "sent", true);
       await fetchMessages();
       currentTab.value = "sent";
     } else if (p2p && connectionState.value === "connected") {
-      // Direct send to explicitly connected PeerJS connections
       p2p.sendCode(content, false);
       await saveMessage(content, "sent", false);
       await fetchMessages();
@@ -124,12 +114,9 @@ const handleDeleteMessage = async (id: string) => {
           src="/logo.png"
           alt="PeerBin Logo"
           class="app-logo-img"
-          onerror="
-            this.style.display = 'none';
-            this.nextElementSibling.style.display = 'inline';
-          "
+          onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"
         />
-        <span class="logo-icon fallback-icon" style="display: none">🔗</span>
+        <span class="logo-icon fallback-icon" style="display:none">🔗</span>
         <h1>PeerBin</h1>
       </div>
 
@@ -138,11 +125,24 @@ const handleDeleteMessage = async (id: string) => {
         <button
           class="btn btn-icon theme-toggle"
           @click="toggleTheme"
-          :title="
-            theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'
-          "
+          :title="theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
         >
-          {{ theme === "dark" ? "☀️" : "🌙" }}
+          <!-- Sun icon -->
+          <svg v-if="theme === 'dark'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <!-- Moon icon -->
+          <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
         </button>
       </div>
     </header>
@@ -157,13 +157,17 @@ const handleDeleteMessage = async (id: string) => {
         />
 
         <div class="info-panel glass-panel mt-4">
-          <h3>P2P Messaging</h3>
+          <div class="info-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            P2P Messaging
+          </div>
           <p>
-            PeerBin is now a secure code messenger! Connect to a peer and swap
-            snippets seamlessly into each other's Inboxes.
+            Connect to a peer and swap snippets directly into each other's Inboxes.
             <br /><br />
-            Hit <strong>Global Broadcast</strong> to send a snippet anonymously
-            to <em>everyone currently using this app worldwide!</em>
+            Use <strong>Global Broadcast</strong> to send anonymously to
+            <em>everyone worldwide!</em>
           </p>
         </div>
       </div>
@@ -175,27 +179,39 @@ const handleDeleteMessage = async (id: string) => {
             :class="{ active: currentTab === 'write' }"
             @click="currentTab = 'write'"
           >
-            ✍️ Sending Now <span v-if="code.trim()" class="draft-dot"></span>
+            <!-- Pen icon -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            Compose
+            <span v-if="code.trim()" class="draft-dot"></span>
           </button>
           <button
             class="tab-btn"
             :class="{ active: currentTab === 'inbox' }"
             @click="currentTab = 'inbox'"
           >
-            📥 Inbox
-            <span class="badge" v-if="inboxMsgs.length">{{
-              inboxMsgs.length
-            }}</span>
+            <!-- Inbox icon -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+            Inbox
+            <span class="badge" v-if="inboxMsgs.length">{{ inboxMsgs.length }}</span>
           </button>
           <button
             class="tab-btn"
             :class="{ active: currentTab === 'sent' }"
             @click="currentTab = 'sent'"
           >
-            📤 Sent
-            <span class="badge" v-if="sentMsgs.length">{{
-              sentMsgs.length
-            }}</span>
+            <!-- Send icon -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            Sent
+            <span class="badge" v-if="sentMsgs.length">{{ sentMsgs.length }}</span>
           </button>
         </div>
 
@@ -234,8 +250,8 @@ const handleDeleteMessage = async (id: string) => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: 1.5rem;
-  gap: 1.5rem;
+  padding: 1.25rem;
+  gap: 1.25rem;
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
@@ -245,7 +261,7 @@ const handleDeleteMessage = async (id: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0.9rem 1.75rem;
 }
 
 .logo {
@@ -255,10 +271,12 @@ const handleDeleteMessage = async (id: string) => {
 }
 
 .app-logo-img {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
   object-fit: cover;
+  box-shadow: 0 4px 14px var(--accent-glow);
+  flex-shrink: 0;
 }
 
 .logo-icon.fallback-icon {
@@ -270,80 +288,96 @@ const handleDeleteMessage = async (id: string) => {
   background: linear-gradient(
     135deg,
     var(--text-primary) 0%,
-    var(--accent-color) 100%
+    var(--accent-color) 60%,
+    var(--accent-secondary) 100%
   );
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 1.8rem;
+  font-size: 1.75rem;
   margin: 0;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
+}
+
+.tagline {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
+  opacity: 0.8;
 }
 
 .theme-toggle {
-  font-size: 1.2rem;
-  padding: 0.4rem;
+  width: 38px;
+  height: 38px;
+  padding: 0;
   border-radius: 50%;
   background: var(--btn-bg);
-  border: none;
-  color: var(--text-primary);
+  border: 1px solid var(--surface-border);
+  color: var(--accent-color);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .theme-toggle:hover {
   background: var(--btn-hover-bg);
-  transform: rotate(15deg) scale(1.1);
+  border-color: var(--accent-color);
+  transform: rotate(20deg) scale(1.1);
+  box-shadow: 0 0 14px var(--accent-glow);
 }
 
 [data-theme="light"] .logo h1 {
   background: linear-gradient(
     135deg,
-    var(--accent-color) 0%,
-    var(--accent-secondary) 100%
+    var(--accent-deep) 0%,
+    var(--accent-color) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.tagline {
-  color: var(--text-secondary);
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
 .main-content {
   display: flex;
   flex: 1;
-  gap: 1.5rem;
-  height: calc(100% - 100px);
+  gap: 1.25rem;
+  min-height: 0;
 }
 
 .sidebar {
-  width: 350px;
+  width: 340px;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
 }
 
 .info-panel {
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
 }
 
-.info-panel h3 {
-  font-size: 1rem;
-  color: var(--accent-secondary);
+.info-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   margin-bottom: 0.75rem;
 }
 
 .info-panel p {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .workspace-area {
@@ -356,9 +390,10 @@ const handleDeleteMessage = async (id: string) => {
 
 .tabs-nav {
   display: flex;
-  padding: 0.5rem;
-  gap: 0.5rem;
+  padding: 0.4rem;
+  gap: 0.35rem;
   border-radius: 12px;
+  flex-shrink: 0;
 }
 
 .tab-btn {
@@ -366,44 +401,48 @@ const handleDeleteMessage = async (id: string) => {
   background: transparent;
   color: var(--text-secondary);
   border: none;
-  padding: 0.75rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 9px;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  font-family: inherit;
 }
 
 .tab-btn:hover {
-  background: rgba(100, 100, 100, 0.1);
+  background: var(--surface-hover);
   color: var(--text-primary);
 }
 
 .tab-btn.active {
   background: var(--accent-color);
   color: #fff;
-  box-shadow: 0 4px 15px var(--accent-glow);
+  box-shadow: 0 4px 18px var(--accent-glow);
 }
 
 .draft-dot {
   width: 6px;
   height: 6px;
-  background: #ffbd2e;
+  background: #fcd34d;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .badge {
-  background: var(--badge-bg);
-  padding: 0.1rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
 }
-.tab-btn.active .badge {
-  background: var(--badge-active);
+.tab-btn:not(.active) .badge {
+  background: var(--badge-bg);
+  color: var(--accent-color);
 }
 
 .tab-content {
@@ -412,6 +451,6 @@ const handleDeleteMessage = async (id: string) => {
 }
 
 .mt-4 {
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
 }
 </style>

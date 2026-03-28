@@ -42,7 +42,7 @@ const langInfo = computed(() => detectLanguage(props.modelValue));
 <template>
   <div class="editor-container glass-panel">
     <div class="editor-header">
-      <div style="display: flex; align-items: center; gap: 1rem">
+      <div class="editor-header-left">
         <div class="window-controls">
           <span class="control close"></span>
           <span class="control minimize"></span>
@@ -57,29 +57,43 @@ const langInfo = computed(() => detectLanguage(props.modelValue));
       <div class="header-actions">
         <button
           class="btn btn-sm"
-          :class="props.isConnected ? 'btn-primary' : 'btn-disabled'"
+          :class="props.isConnected ? 'btn-primary' : ''"
           :disabled="!props.isConnected || !props.modelValue.trim()"
           @click="emit('sendCode', props.modelValue, false)"
-          title="Send specifically to Peer"
+          title="Send directly to connected peer"
         >
-          🚀 Direct Send
+          <!-- Arrow up-right icon -->
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7"/>
+            <polyline points="7 7 17 7 17 17"/>
+          </svg>
+          Direct Send
         </button>
         <button
-          class="btn btn-sm btn-warning"
+          class="btn btn-sm btn-warm"
           :disabled="!props.modelValue.trim()"
           @click="emit('sendCode', props.modelValue, true)"
-          title="Broadcast to Global Channel"
+          title="Broadcast to all users worldwide"
         >
-          🌍 Global Broadcast
+          <!-- Globe icon -->
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          Global Broadcast
         </button>
       </div>
     </div>
+
+    <div class="accent-line"></div>
+
     <textarea
       class="editor-textarea"
       :value="props.modelValue"
       @input="handleInput"
       @keydown="handleKeydown"
-      placeholder="// Write your code snippet here.&#10;// We automatically detect your language!&#10;// When ready, click 'Direct Send' or 'Global Broadcast' to route it."
+      placeholder="// Write your code snippet here.&#10;// We automatically detect your language!&#10;// When ready, click 'Direct Send' or 'Global Broadcast'."
       spellcheck="false"
     ></textarea>
   </div>
@@ -95,12 +109,19 @@ const langInfo = computed(() => detectLanguage(props.modelValue));
 }
 
 .editor-header {
-  padding: 0.75rem 1rem;
+  padding: 0.7rem 1.1rem;
   background: var(--header-bg);
   border-bottom: 1px solid var(--surface-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
+}
+
+.editor-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .window-controls {
@@ -109,52 +130,35 @@ const langInfo = computed(() => detectLanguage(props.modelValue));
 }
 
 .control {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
 }
-.control.close {
-  background: #ff5f56;
-}
-.control.minimize {
-  background: #ffbd2e;
-}
-.control.maximize {
-  background: #27c93f;
-}
+.control.close   { background: #ff5f56; }
+.control.minimize { background: #ffbd2e; }
+.control.maximize { background: #27c93f; }
 
 .filename {
   font-family: "Fira Code", monospace;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
-.lang-icon {
-  font-size: 1rem;
-}
+.lang-icon { font-size: 0.95rem; }
 
 .header-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
-.btn-disabled {
-  background: var(--btn-disabled);
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.btn-warning {
-  background: var(--accent-secondary);
-  border-color: var(--accent-secondary);
-  box-shadow: 0 0 15px rgba(232, 28, 255, 0.4);
-}
-.btn-warning:hover:not(:disabled) {
-  background: #f04dff;
-  box-shadow: 0 0 25px rgba(232, 28, 255, 0.6);
+/* Thin accent gradient line below header */
+.accent-line {
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary), transparent);
+  flex-shrink: 0;
 }
 
 .editor-textarea {
@@ -165,10 +169,14 @@ const langInfo = computed(() => detectLanguage(props.modelValue));
   border: none;
   padding: 1.5rem;
   font-family: "Fira Code", monospace;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 0.98rem;
+  line-height: 1.7;
   color: var(--text-primary);
   outline: none;
+}
+.editor-textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.45;
 }
 .editor-textarea:focus {
   box-shadow: none;
