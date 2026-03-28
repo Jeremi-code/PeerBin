@@ -264,3 +264,68 @@ input[type="text"]:focus, textarea:focus {
   background: rgba(232, 101, 75, 0.4);
   background-clip: content-box;
 }
+
+/* ═══════════════════════════════════════════
+   Mobile Responsive
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  body { font-size: 15px; }
+
+  .app-layout {
+    padding: 0.65rem !important;
+    gap: 0.65rem !important;
+    height: auto !important;
+    min-height: 100dvh;
+    overflow-y: auto !important;
+    flex-direction: column;
+  }
+
+  /* Stack main-content vertically */
+  .main-content {
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Sidebar takes full width */
+  .sidebar {
+    width: 100% !important;
+  }
+
+  /* Workspace clips naturally */
+  .workspace-area {
+    min-height: 70vh;
+  }
+
+  /* Header compact */
+  .app-header {
+    padding: 0.65rem 0.9rem !important;
+  }
+
+  /* Hide tagline on mobile */
+  .tagline { display: none; }
+
+  /* Inputs bigger tap targets */
+  input[type="text"] {
+    padding: 0.85rem 1rem;
+    font-size: 1rem;
+  }
+
+  /* Buttons */
+  .btn { padding: 0.65rem 1rem; font-size: 0.88rem; }
+  .btn-sm { padding: 0.55rem 0.8rem; }
+
+  /* Reduce backdrop blur for perf */
+  .glass-panel {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Tab buttons smaller */
+  .tab-btn {
+    padding: 0.55rem 0.4rem !important;
+    font-size: 0.78rem !important;
+    gap: 0.3rem !important;
+  }
+}

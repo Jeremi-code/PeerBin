@@ -277,13 +277,15 @@ const handleDeleteMessage = async (id: string) => {
   height: 38px;
   border-radius: 9px;
   object-fit: cover;
-  box-shadow: 0 4px 14px var(--accent-glow);
+  /* Tint the logo with a warm Thunderbird overlay using mix-blend */
+  box-shadow: 0 4px 16px var(--accent-glow), 0 0 0 2px rgba(232, 101, 75, 0.2);
   flex-shrink: 0;
+  filter: hue-rotate(0deg) saturate(1.1);
 }
 
 .logo-icon.fallback-icon {
-  font-size: 1.8rem;
-  filter: drop-shadow(0 0 8px var(--accent-color));
+  font-size: 1.9rem;
+  filter: drop-shadow(0 0 10px var(--accent-color));
 }
 
 .logo h1 {
