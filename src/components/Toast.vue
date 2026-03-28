@@ -33,8 +33,8 @@ const icons: Record<Toast["type"], string> = {
 <style scoped>
 .toast-container {
   position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
+  top: 1.25rem;
+  right: 1.25rem;
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -97,4 +97,15 @@ const icons: Record<Toast["type"], string> = {
 .toast-enter-active { animation: slideIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .toast-leave-active { animation: slideIn 0.2s ease reverse; }
 .toast-move { transition: transform 0.25s ease; }
+
+@media (max-width: 640px) {
+  .toast-container {
+    left: 0.75rem;
+    right: 0.75rem;
+    top: 0.75rem;
+  }
+  .toast {
+    max-width: 100%;
+  }
+}
 </style>
