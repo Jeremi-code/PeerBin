@@ -12,6 +12,7 @@ import {
   getMessages,
   saveMessage,
   deleteMessage,
+  clearMessages,
   type MessageItem,
 } from "./utils/db";
 
@@ -103,6 +104,11 @@ const handleSendCode = async (content: string, isGlobal: boolean) => {
 
 const handleDeleteMessage = async (id: string) => {
   await deleteMessage(id);
+  await fetchMessages();
+};
+
+const handleClearMessages = async (type: "inbox" | "sent") => {
+  await clearMessages(type);
   await fetchMessages();
 };
 </script>
@@ -231,6 +237,7 @@ const handleDeleteMessage = async (id: string) => {
             emptyMessage="Your inbox is empty. Waiting for peers to send you code!"
             :messages="inboxMsgs"
             @delete="handleDeleteMessage"
+            @deleteAll="handleClearMessages('inbox')"
           />
         </div>
 
@@ -240,6 +247,7 @@ const handleDeleteMessage = async (id: string) => {
             emptyMessage="You haven't sent any snippets yet."
             :messages="sentMsgs"
             @delete="handleDeleteMessage"
+            @deleteAll="handleClearMessages('sent')"
           />
         </div>
       </div>
