@@ -75,7 +75,8 @@ const handleDeleteAll = () => {
 
       <button
         v-if="props.messages.length > 0"
-        class="btn btn-icon delete-all-btn"
+        class="btn btn-icon delete-all-btn has-tooltip"
+        data-tooltip="Delete All Messages"
         @click="handleDeleteAll"
         title="Delete All Messages"
       >
@@ -114,7 +115,8 @@ const handleDeleteAll = () => {
           <code class="preview" v-if="expandedId !== msg.id">{{ getPreview(msg.content) }}</code>
           <div class="actions">
             <button
-              class="btn btn-icon delete-btn"
+              class="btn btn-icon delete-btn has-tooltip"
+              data-tooltip="Delete message"
               @click.stop="emit('delete', msg.id)"
               title="Delete"
             >
@@ -135,7 +137,7 @@ const handleDeleteAll = () => {
                 {{ detectLanguage(msg.content).name }}
               </span>
             </div>
-            <button class="btn btn-icon-sm" @click="expandedId = null" title="Collapse">
+            <button class="btn btn-icon-sm has-tooltip" data-tooltip="Collapse" @click="expandedId = null" title="Collapse">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="18 15 12 9 6 15"></polyline>
               </svg>

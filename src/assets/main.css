@@ -329,3 +329,37 @@ input[type="text"]:focus, textarea:focus {
     gap: 0.3rem !important;
   }
 }
+
+/* Tooltips (Mobile focus) */
+.has-tooltip {
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .has-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background: rgba(19, 9, 5, 0.95);
+    color: #fff;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.15s ease;
+    border: 1px solid rgba(232, 101, 75, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+  }
+
+  .has-tooltip:active::after,
+  .has-tooltip:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
