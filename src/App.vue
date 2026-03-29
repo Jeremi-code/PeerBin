@@ -132,7 +132,7 @@ const handleClearMessages = async (type: "inbox" | "sent") => {
         <p class="tagline">Decentralized Snippet Messenger</p>
         
         <a 
-          href="https://github.com/jeremi-code/peer-bin" 
+          href="https://github.com/Jeremi-code/PeerBin" 
           target="_blank" 
           class="github-btn has-tooltip"
           rel="noopener noreferrer"
