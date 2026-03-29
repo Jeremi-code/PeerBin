@@ -132,7 +132,8 @@ const canFormat = computed(() => {
       <div class="header-actions">
         <!-- Format button -->
         <button
-          class="btn btn-sm btn-format"
+          class="btn btn-sm btn-format has-tooltip"
+          :data-tooltip="canFormat ? 'Format code' : 'No formatter'"
           :class="{ spinning: isFormatting }"
           :disabled="!props.modelValue.trim() || !canFormat || isFormatting"
           @click="handleFormat"
@@ -149,7 +150,8 @@ const canFormat = computed(() => {
 
         <!-- Download button -->
         <button
-          class="btn btn-sm"
+          class="btn btn-sm has-tooltip"
+          data-tooltip="Export to file"
           :disabled="!props.modelValue.trim()"
           @click="handleDownload"
           title="Download as file"
@@ -164,8 +166,9 @@ const canFormat = computed(() => {
 
         <!-- Direct Send -->
         <button
-          class="btn btn-sm"
+          class="btn btn-sm has-tooltip"
           :class="props.isConnected ? 'btn-primary' : ''"
+          data-tooltip="Direct Send"
           :disabled="!props.isConnected || !props.modelValue.trim()"
           @click="emit('sendCode', props.modelValue, false); show('Snippet sent to peer!', 'success')"
           title="Send directly to peer (Ctrl+Enter)"
@@ -179,7 +182,8 @@ const canFormat = computed(() => {
 
         <!-- Global Broadcast -->
         <button
-          class="btn btn-sm btn-warm"
+          class="btn btn-sm btn-warm has-tooltip"
+          data-tooltip="Global Broadcast"
           :disabled="!props.modelValue.trim()"
           @click="emit('sendCode', props.modelValue, true); show('Broadcasted globally!', 'warning')"
           title="Broadcast to all users worldwide"
