@@ -119,3 +119,24 @@ export async function deleteMessage(id: string): Promise<void> {
     transaction.onerror = () => reject(transaction.error);
   });
 }
+
+export async function clearMessages(type: "inbox" | "sent"): Promise<void> {
+  const db = await openDB();
+  const transaction = db.transaction([MSG_STORE_NAME], "readwrite");
+  const store = transaction.objectStore(MSG_STORE_NAME);
+  const request = store.openCursor();
+
+  return new Promise((resolve, reject) => {
+    request.onsuccess = (event) => {
+      const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+      if (cursor) {
+        if (cursor.value.type === type) {
+          cursor.delete();
+        }
+        cursor.continue();
+      }
+    };
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
