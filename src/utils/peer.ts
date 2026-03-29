@@ -6,12 +6,14 @@ interface PeerEvents {
   onStateChange: (state: ConnectState) => void;
   onCodeReceived: (code: string, isGlobal: boolean) => void;
   onIdGenerated: (id: string) => void;
+  onConnectionError: (error: string) => void;
 }
 
 export class OnlinePeer {
   private peer: Peer | null = null;
   private conns: Map<string, DataConnection> = new Map();
   private events: PeerEvents;
+  private connectionTimeouts: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
   constructor(events: PeerEvents) {
     this.events = events;
@@ -23,18 +25,19 @@ export class OnlinePeer {
       host: "0.peerjs.com",
       port: 443,
       secure: true,
-      debug: 2,
+      debug: 1,
       config: {
         iceServers: [
-          // STUN servers — discover public IP for direct/NAT traversal
+          // STUN servers — high reliability for direct/NAT traversal
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:stun1.l.google.com:19302" },
           { urls: "stun:stun2.l.google.com:19302" },
           { urls: "stun:stun3.l.google.com:19302" },
           { urls: "stun:stun4.l.google.com:19302" },
+          { urls: "stun:stun.cloudflare.com:3478" },
           { urls: "stun:stun.stunprotocol.org:3478" },
-          // TURN relay servers — essential fallback when STUN/direct fails
-          // (covers strict NAT, firewalls, and same-LAN routing edge cases)
+          { urls: "stun:stun.framasoft.org:3478" },
+          // TURN relay servers — fallback when STUN/direct fails
           {
             urls: "turn:openrelay.metered.ca:80",
             username: "openrelayproject",
@@ -87,7 +90,19 @@ export class OnlinePeer {
     this.conns.set(connection.peer, connection);
     this.events.onStateChange("connecting");
 
+    // Set a 12-second timeout to prevent hanging connections
+    const timeoutId = setTimeout(() => {
+      console.warn(`Connection to ${connection.peer} timed out.`);
+      this.events.onConnectionError(
+        `Failed to connect to ${connection.peer}. Your networks might be shielded by strict firewalls without an available relay.`
+      );
+      connection.close();
+    }, 12000);
+    this.connectionTimeouts.set(connection.peer, timeoutId);
+
     connection.on("open", () => {
+      clearTimeout(this.connectionTimeouts.get(connection.peer));
+      this.connectionTimeouts.delete(connection.peer);
       this.events.onStateChange("connected");
     });
 
@@ -104,6 +119,8 @@ export class OnlinePeer {
     });
 
     connection.on("close", () => {
+      clearTimeout(this.connectionTimeouts.get(connection.peer));
+      this.connectionTimeouts.delete(connection.peer);
       this.conns.delete(connection.peer);
       if (this.conns.size === 0) {
         this.events.onStateChange("disconnected");
@@ -112,6 +129,9 @@ export class OnlinePeer {
 
     connection.on("error", (err) => {
       console.error("Connection error", err);
+      clearTimeout(this.connectionTimeouts.get(connection.peer));
+      this.connectionTimeouts.delete(connection.peer);
+      this.events.onConnectionError("Connection lost or failed to establish.");
       this.conns.delete(connection.peer);
       if (this.conns.size === 0) {
         this.events.onStateChange("disconnected");
@@ -121,7 +141,9 @@ export class OnlinePeer {
 
   public connectTo(targetId: string) {
     if (!this.peer) return;
-    const connection = this.peer.connect(targetId.toUpperCase());
+    const connection = this.peer.connect(targetId.toUpperCase(), {
+      reliable: true,
+    });
     this.setupConnection(connection);
   }
 
@@ -135,6 +157,11 @@ export class OnlinePeer {
   }
 
   public disconnect() {
+    for (const [id, timeout] of this.connectionTimeouts.entries()) {
+      clearTimeout(timeout);
+    }
+    this.connectionTimeouts.clear();
+
     for (const [_, conn] of this.conns.entries()) {
       conn.close();
     }

@@ -6,6 +6,7 @@ import MessageList from "./components/MessageList.vue";
 import Toast from "./components/Toast.vue";
 import { OnlinePeer, type ConnectState } from "./utils/peer";
 import { GlobalRelay } from "./utils/mqtt";
+import { useToast } from "./composables/useToast";
 import {
   saveSnippet,
   loadSnippet,
@@ -19,6 +20,7 @@ import {
 const SNIPPET_ID = "draft-snippet";
 
 // State
+const { show: showToast } = useToast();
 const currentTab = ref<"write" | "inbox" | "sent">("write");
 const code = ref("");
 const connectionState = ref<ConnectState>("disconnected");
@@ -51,6 +53,11 @@ onMounted(async () => {
     onIdGenerated: (id) => {
       peerId.value = id;
     },
+    onConnectionError: (errorMsg) => {
+      // Use the injected Toast component reference
+      showToast(errorMsg, "error", 5000);
+      connectionState.value = "disconnected";
+    }
   });
 
   p2p.init();
