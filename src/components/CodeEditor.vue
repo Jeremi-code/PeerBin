@@ -144,7 +144,7 @@ const canFormat = computed(() => {
             <line x1="14" y1="12" x2="20" y2="12"/>
             <polyline points="4 11 4 21"/>
           </svg>
-          {{ isFormatting ? "…" : "Format" }}
+          <span>{{ isFormatting ? "…" : "Format" }}</span>
         </button>
 
         <!-- Download button -->
@@ -159,7 +159,7 @@ const canFormat = computed(() => {
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
-          Export
+          <span>Export</span>
         </button>
 
         <!-- Direct Send -->
@@ -174,7 +174,7 @@ const canFormat = computed(() => {
             <line x1="7" y1="17" x2="17" y2="7"/>
             <polyline points="7 7 17 7 17 17"/>
           </svg>
-          Direct Send
+          <span>Direct Send</span>
         </button>
 
         <!-- Global Broadcast -->
@@ -189,7 +189,7 @@ const canFormat = computed(() => {
             <line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>
-          Global Broadcast
+          <span>Global Broadcast</span>
         </button>
       </div>
     </div>
@@ -250,6 +250,7 @@ const canFormat = computed(() => {
   align-items: center;
   flex-shrink: 0;
   gap: 0.75rem;
+  flex-wrap: wrap; /* Allow wrapping for very small screens */
 }
 
 .editor-header-left {
@@ -281,9 +282,22 @@ const canFormat = computed(() => {
 
 .header-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: nowrap;
-  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .header-actions .btn span {
+    display: none;
+  }
+  .header-actions .btn {
+    padding: 0.5rem;
+    min-width: 32px;
+    justify-content: center;
+  }
+  .editor-header {
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 .accent-line {

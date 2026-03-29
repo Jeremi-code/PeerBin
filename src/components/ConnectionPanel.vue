@@ -251,7 +251,7 @@ const copyToClipboard = async (text: string) => {
 .peer-id-display {
   flex: 1;
   font-family: "Fira Code", monospace;
-  font-size: 1.1rem;
+  font-size: clamp(0.9rem, 4vw, 1.1rem);
   font-weight: 700;
   letter-spacing: 4px;
   text-align: center;
@@ -259,7 +259,9 @@ const copyToClipboard = async (text: string) => {
   background: var(--input-bg);
   border: 1px solid var(--surface-border);
   border-radius: 8px;
-  padding: 0.6rem 0.75rem;
+  padding: 0.6rem 0.5rem;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .btn-copy {
