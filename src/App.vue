@@ -134,12 +134,24 @@ const handleClearMessages = async (type: "inbox" | "sent") => {
         <a 
           href="https://github.com/jeremi-code/peer-bin" 
           target="_blank" 
-          class="btn btn-icon github-btn has-tooltip"
-          data-tooltip="View on GitHub"
-          title="GitHub Repository"
+          class="github-btn has-tooltip"
+          rel="noopener noreferrer"
+          data-tooltip="View source on GitHub"
+          aria-label="View source on GitHub"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          <svg
+            class="theme-github-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+            width="20"
+            height="20"
+          >
+            <path
+              fill="currentColor"
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"
+            />
           </svg>
         </a>
 
@@ -326,7 +338,7 @@ const handleClearMessages = async (type: "inbox" | "sent") => {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.75rem;
 }
 
 .tagline {
@@ -335,6 +347,7 @@ const handleClearMessages = async (type: "inbox" | "sent") => {
   font-size: 0.9rem;
   letter-spacing: 0.3px;
   opacity: 0.8;
+  margin-right: 0.5rem;
 }
 
 .theme-toggle {
@@ -361,24 +374,33 @@ const handleClearMessages = async (type: "inbox" | "sent") => {
 .github-btn {
   width: 38px;
   height: 38px;
-  border-radius: 50% !important;
+  border-radius: 50%;
   color: var(--accent-color);
   background: var(--btn-bg);
-  border: 1px solid var(--surface-border) !important;
+  border: 1px solid var(--surface-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  text-decoration: none;
 }
+
 .github-btn:hover {
   background: var(--btn-hover-bg);
-  border-color: var(--accent-color) !important;
+  border-color: var(--accent-color);
   transform: scale(1.1);
   box-shadow: 0 0 14px var(--accent-glow);
 }
+
 .github-btn svg {
-  opacity: 0.85;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  opacity: 0.9;
+  transition: opacity 0.2s;
 }
+
 .github-btn:hover svg {
   opacity: 1;
 }
