@@ -19,7 +19,8 @@ const { show } = useToast();
 const expandedId = ref<string | null>(null);
 
 const formatDate = (ts: number) => {
-  return new Date(ts).toLocaleString(undefined, {
+  const d = new Date(ts);
+  return d.toLocaleString(undefined, {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -130,33 +131,37 @@ const handleDeleteAll = () => {
         </div>
 
         <div class="card-content" v-if="expandedId === msg.id">
-          <div class="code-viewer-header">
-            <div class="viewer-header-left">
-              <span class="lang-label">
-                {{ detectLanguage(msg.content).icon }}
+          <!-- Premium Integrated Code Viewer -->
+          <div class="code-art-container">
+            <div class="code-art-header">
+              <div class="art-lang">
+                <span class="art-icon">{{ detectLanguage(msg.content).icon }}</span>
                 {{ detectLanguage(msg.content).name }}
-              </span>
+              </div>
+              <div class="art-actions">
+                <button class="btn-art" @click="copyToClipboard(msg.content)" title="Copy Source">
+                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                  </svg>
+                  Copy
+                </button>
+                <button class="btn-art btn-collapse" @click="expandedId = null" title="Collapse">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <button class="btn btn-icon-sm has-tooltip" data-tooltip="Collapse" @click="expandedId = null" title="Collapse">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="18 15 12 9 6 15"></polyline>
-              </svg>
-            </button>
-          </div>
-          <div class="code-wrapper">
-            <div class="code-scroll-area">
-              <pre><code class="hljs" v-html="highlightCode(msg.content)"></code></pre>
+            
+            <div class="code-viewport">
+               <pre><code class="hljs" v-html="highlightCode(msg.content)"></code></pre>
             </div>
-          </div>
-          <div class="content-actions">
-            <button class="btn btn-sm btn-outline" @click="copyToClipboard(msg.content)">
-              <!-- Copy icon -->
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-              Copy Source
-            </button>
+
+            <!-- Footer accent -->
+            <div class="code-art-footer">
+              Snippet received at {{ formatDate(msg.timestamp) }}
+            </div>
           </div>
         </div>
       </div>
@@ -249,21 +254,22 @@ const handleDeleteAll = () => {
   border: 1px solid var(--surface-border);
   border-radius: 10px;
   overflow: hidden;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .message-card:hover:not(.expanded) {
-  border-color: rgba(232, 101, 75, 0.25);
+  border-color: rgba(232, 101, 75, 0.3);
   background: var(--card-hover);
   transform: translateY(-1px);
 }
 .message-card.expanded {
   border-color: var(--accent-color);
-  box-shadow: 0 4px 20px var(--accent-glow);
-  background: rgba(232, 101, 75, 0.03);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  background: rgba(232, 101, 75, 0.02);
+  margin: 0.25rem 0;
 }
 
 .card-header {
-  padding: 0.75rem 0.85rem;
+  padding: 0.85rem 1rem;
   display: flex;
   align-items: center;
   gap: 0.8rem;
@@ -315,7 +321,7 @@ const handleDeleteAll = () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.7;
+  opacity: 0.6;
   min-width: 0;
 }
 
@@ -323,23 +329,6 @@ const handleDeleteAll = () => {
   display: flex;
   gap: 0.4rem;
   flex-shrink: 0;
-}
-
-.btn-icon-sm {
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary);
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.btn-icon-sm:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
 }
 
 .btn-icon {
@@ -360,70 +349,99 @@ const handleDeleteAll = () => {
   color: var(--danger-color);
 }
 
+/* Creative Code Viewer */
 .card-content {
   border-top: 1px solid var(--surface-border);
-  background: rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
+  padding: 0.65rem;
+  background: rgba(0, 0, 0, 0.1);
 }
 
-.code-viewer-header {
-  padding: 0.5rem 0.85rem;
-  background: rgba(232, 101, 75, 0.05);
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-bottom: 1px solid var(--surface-border);
+.code-art-container {
+  /* Darker, more solid background to reduce conflict with dot-grid */
+  background: #1a0b06; 
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(232, 101, 75, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.code-art-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0.7rem 1.1rem;
+  background: linear-gradient(to right, rgba(232, 101, 75, 0.12), rgba(232, 101, 75, 0.03));
+  border-bottom: 1px solid rgba(232, 101, 75, 0.1);
 }
 
-.lang-label {
+.art-lang {
+  font-size: 0.72rem;
+  font-weight: 700;
   color: var(--accent-color);
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-.code-wrapper {
-  padding: 0.75rem;
-}
-
-.code-scroll-area {
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 1.25rem;
-  background: rgba(19, 9, 5, 0.5);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-}
-.code-scroll-area pre {
-  margin: 0;
-  background: transparent;
-}
-.code-scroll-area code {
-  font-family: "Fira Code", monospace;
-  font-size: 0.88rem;
-  line-height: 1.6;
-}
-
-.content-actions {
-  padding: 0.75rem 1rem;
+.art-actions {
   display: flex;
-  justify-content: flex-end;
-  background: rgba(232, 101, 75, 0.03);
-  border-top: 1px solid var(--surface-border);
+  gap: 0.5rem;
 }
 
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--surface-border);
+.btn-art {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(232, 101, 75, 0.25);
   color: var(--text-secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.25s;
+  text-transform: uppercase;
 }
-.btn-outline:hover {
+.btn-art:hover {
+  background: rgba(232, 101, 75, 0.15);
   border-color: var(--accent-color);
   color: var(--accent-color);
-  background: rgba(232, 101, 75, 0.05);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(232, 101, 75, 0.1);
+}
+
+.btn-collapse {
+  padding: 0.25rem 0.5rem;
+}
+
+.code-viewport {
+  max-height: 550px;
+  overflow: auto;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.15);
+}
+.code-viewport code {
+  font-family: "Fira Code", monospace;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: #fdf5f3; /* explicit text-primary for high contrast */
+}
+
+.code-art-footer {
+  padding: 0.5rem 1.1rem;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  opacity: 0.45;
+  text-align: right;
+  border-top: 1px solid rgba(232, 101, 75, 0.08);
+  background: rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .empty-state {
@@ -444,5 +462,11 @@ const handleDeleteAll = () => {
   text-align: center;
   max-width: 260px;
   line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .preview { display: none; }
+  .code-viewport { padding: 0.85rem; }
+  .code-viewport code { font-size: 0.82rem; }
 }
 </style>
