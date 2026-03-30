@@ -22,10 +22,6 @@ export class OnlinePeer {
   public init() {
     const randomId = Math.random().toString(36).substring(2, 7).toUpperCase();
     this.peer = new Peer(randomId, {
-      host: "0.peerjs.com",
-      port: 443,
-      secure: true,
-      debug: 1,
       config: {
         iceServers: [
           // STUN servers — high reliability for direct/NAT traversal
