@@ -36,6 +36,19 @@
 
   /* Dot grid pattern color */
   --dot-color: rgba(232, 101, 75, 0.13);
+
+  /* Code view variables */
+  --code-bg: #1a0b06;
+  --code-viewport-bg: rgba(0, 0, 0, 0.22);
+  --hljs-keyword: #e8654b;
+  --hljs-string: #c9b191;
+  --hljs-comment: rgba(201, 123, 104, 0.45);
+  --hljs-function: #f8b6a9;
+  --hljs-number: #fcd34d;
+  --hljs-literal: #fcd34d;
+  --hljs-type: #f8b6a9;
+  --hljs-attr: #c9b191;
+  --hljs-variable: #fdf5f3;
 }
 
 [data-theme="light"] {
@@ -65,12 +78,25 @@
   --header-bg: rgba(253, 231, 227, 0.75);
   --card-bg: rgba(253, 231, 227, 0.65);
   --card-hover: rgba(253, 231, 227, 0.95);
-  --content-bg: #282c34;
-  --code-header-bg: #1e2227;
+  --content-bg: rgba(253, 231, 227, 0.55);
+  --code-header-bg: rgba(253, 231, 227, 0.85);
   --badge-bg: rgba(212, 74, 46, 0.1);
   --badge-active: rgba(212, 74, 46, 0.2);
 
   --dot-color: rgba(212, 74, 46, 0.1);
+
+  /* Code view variables */
+  --code-bg: #fdf5f3;
+  --code-viewport-bg: rgba(212, 74, 46, 0.04);
+  --hljs-keyword: #d44a2e;
+  --hljs-string: #7d695c;
+  --hljs-comment: rgba(66, 22, 13, 0.4);
+  --hljs-function: #b93d24;
+  --hljs-number: #92400e;
+  --hljs-literal: #92400e;
+  --hljs-type: #b93d24;
+  --hljs-attr: #7d695c;
+  --hljs-variable: #42160d;
 }
 
 * {
@@ -362,4 +388,48 @@ input[type="text"]:focus, textarea:focus {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+}
+
+/* ═══════════════════════════════════════════
+   Custom Highlight.js Overrides
+   ═══════════════════════════════════════════ */
+
+.hljs {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.hljs-keyword, .hljs-selector-tag, .hljs-section {
+  color: var(--hljs-keyword) !important;
+  font-weight: 700;
+}
+
+.hljs-string, .hljs-attribute {
+  color: var(--hljs-string) !important;
+}
+
+.hljs-comment, .hljs-quote {
+  color: var(--hljs-comment) !important;
+  font-style: italic;
+}
+
+.hljs-number, .hljs-literal, .hljs-bullet {
+  color: var(--hljs-number) !important;
+}
+
+.hljs-function, .hljs-title, .hljs-params {
+  color: var(--hljs-function) !important;
+  font-weight: 500;
+}
+
+.hljs-type, .hljs-built_in, .hljs-class {
+  color: var(--hljs-type) !important;
+}
+
+.hljs-variable, .hljs-template-variable, .hljs-tag, .hljs-name {
+  color: var(--hljs-variable) !important;
+}
+
+.hljs-attr {
+  color: var(--hljs-attr) !important;
 }

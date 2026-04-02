@@ -353,18 +353,18 @@ const handleDeleteAll = () => {
 .card-content {
   border-top: 1px solid var(--surface-border);
   padding: 0.65rem;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .code-art-container {
-  /* Darker, more solid background to reduce conflict with dot-grid */
-  background: #1a0b06; 
+  /* Theme-responsive background */
+  background: var(--code-bg); 
   border-radius: 10px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(232, 101, 75, 0.2);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--surface-border);
 }
 
 .code-art-header {
@@ -423,13 +423,13 @@ const handleDeleteAll = () => {
   max-height: 550px;
   overflow: auto;
   padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--code-viewport-bg);
 }
 .code-viewport code {
   font-family: "Fira Code", monospace;
   font-size: 0.92rem;
   line-height: 1.7;
-  color: #fdf5f3; /* explicit text-primary for high contrast */
+  color: var(--text-primary);
 }
 
 .code-art-footer {
