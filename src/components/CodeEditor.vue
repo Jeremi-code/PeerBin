@@ -312,13 +312,13 @@ const canFormat = computed(() => {
 
 /* Format button */
 .btn-format {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #a5b4fc;
+  background: rgba(248, 182, 169, 0.1);
+  border-color: rgba(248, 182, 169, 0.25);
+  color: var(--accent-secondary);
 }
 .btn-format:hover:not(:disabled) {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: #818cf8;
+  background: rgba(248, 182, 169, 0.18);
+  border-color: var(--accent-secondary);
 }
 .spin-icon {
   animation: spin 0.8s linear infinite;
@@ -393,13 +393,13 @@ const canFormat = computed(() => {
   color: var(--accent-color);
 }
 .status-formattable {
-  background: rgba(99, 102, 241, 0.15);
-  color: #a5b4fc;
+  background: rgba(232, 101, 75, 0.1);
+  color: var(--accent-color);
   font-size: 0.65rem;
   font-weight: 700;
   padding: 0.1rem 0.45rem;
   border-radius: 5px;
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  border: 1px solid rgba(232, 101, 75, 0.2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
