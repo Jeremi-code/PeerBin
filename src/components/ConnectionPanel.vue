@@ -167,7 +167,7 @@ const copyToClipboard = async (text: string) => {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1.4rem;
 }
 
 .header {
@@ -214,14 +214,15 @@ const copyToClipboard = async (text: string) => {
 
 @keyframes pulse { 0%,100% { opacity:.5; } 50% { opacity:1; } }
 
-.desc { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; }
+.desc { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; margin-bottom: 0.4rem; }
 
 .step-card {
   background: var(--card-bg);
-  padding: 1rem 1.1rem;
-  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  border-radius: 12px;
   border: 1px solid var(--surface-border);
-  border-left: 3px solid var(--accent-color);
+  border-left: 2px solid var(--accent-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 .step-card label {
   font-size: 0.75rem;
@@ -234,12 +235,14 @@ const copyToClipboard = async (text: string) => {
 .divider {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.8rem;
   color: var(--text-secondary);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
+  margin: 1.1rem 0;
+  opacity: 0.75;
 }
 .divider::before,.divider::after { content:""; flex:1; height:1px; background:var(--surface-border); }
 
