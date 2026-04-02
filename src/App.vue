@@ -320,7 +320,7 @@ const handleClearMessages = async (type: "inbox" | "sent") => {
   /* Tint the logo with a warm Thunderbird overlay using mix-blend */
   box-shadow: 0 4px 16px var(--accent-glow), 0 0 0 2px rgba(232, 101, 75, 0.2);
   flex-shrink: 0;
-  filter: hue-rotate(0deg) saturate(1.1);
+  filter: saturate(1.05);
 }
 
 .logo-icon.fallback-icon {
