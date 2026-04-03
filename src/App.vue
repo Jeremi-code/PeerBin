@@ -54,20 +54,29 @@ onMounted(async () => {
       peerId.value = id;
     },
     onConnectionError: (errorMsg) => {
-      // Use the injected Toast component reference
       showToast(errorMsg, "error", 5000);
       connectionState.value = "disconnected";
     }
   });
 
-  p2p.init();
-
-  relay = new GlobalRelay(async (receivedCode) => {
-    await saveMessage(receivedCode, "inbox", true);
-    await fetchMessages();
+  // 1. Initialize P2P with a sender callback that uses the relay
+  p2p.init((targetId, signal) => {
+    relay?.sendSignal(targetId, signal);
   });
 
-  relay.init();
+  // 2. Initialize Relay with a signal handler that feeds into P2P
+  relay = new GlobalRelay(
+    async (receivedCode) => {
+      await saveMessage(receivedCode, "inbox", true);
+      await fetchMessages();
+    },
+    (senderId, signalData) => {
+      p2p?.handleIncomingSignal(senderId, signalData);
+    }
+  );
+
+  // 3. Connect relay using the generated P2P ID
+  relay.init(peerId.value);
 });
 
 const toggleTheme = () => {
