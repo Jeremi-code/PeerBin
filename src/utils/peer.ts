@@ -49,15 +49,31 @@ export class OnlinePeer {
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:stun1.l.google.com:19302" },
           { urls: "stun:stun2.l.google.com:19302" },
-          { urls: "turn:global.relay.metered.ca:443",
+          { urls: "stun:stun3.l.google.com:19302" },
+          { urls: "stun:stun4.l.google.com:19302" },
+          { urls: "stun:stun.cloudflare.com:3478" },
+          { urls: "stun:stun.stunprotocol.org:3478" },
+          {
+            urls: "turn:global.relay.metered.ca:80",
             username: import.meta.env.VITE_TURN_USERNAME,
-            credential: import.meta.env.VITE_TURN_CREDENTIAL
-          }
+            credential: import.meta.env.VITE_TURN_CREDENTIAL,
+          },
+          {
+            urls: "turn:global.relay.metered.ca:443",
+            username: import.meta.env.VITE_TURN_USERNAME,
+            credential: import.meta.env.VITE_TURN_CREDENTIAL,
+          },
+          {
+            urls: "turns:global.relay.metered.ca:443?transport=tcp",
+            username: import.meta.env.VITE_TURN_USERNAME,
+            credential: import.meta.env.VITE_TURN_CREDENTIAL,
+          },
         ]
       }
     });
 
     peer.on("signal", (data) => {
+      console.log(`📤 Sending signal to ${targetId}:`, data.type || "ice-candidate");
       this.signalSender?.(targetId, data);
     });
 
@@ -67,10 +83,12 @@ export class OnlinePeer {
     });
 
     peer.on("data", (data) => {
+      console.log(`📥 P2P Data received from ${targetId}`);
       try {
         const parsed = JSON.parse(data.toString());
         this.events.onCodeReceived(parsed.content, parsed.isGlobal);
       } catch {
+        // Fallback for raw text
         this.events.onCodeReceived(data.toString(), false);
       }
     });
@@ -85,6 +103,11 @@ export class OnlinePeer {
 
     peer.on("error", (err) => {
       console.error(`P2P Error with ${targetId}:`, err);
+      // Ignore some non-fatal errors like "Connection failed" during trickle if it eventually succeeds
+      if (err.message.includes("Connection failed")) {
+        console.warn("⚠️ P2P connection attempt failed. Waiting for trickle...");
+        return;
+      }
       this.events.onConnectionError(`P2P Error: ${err.message}`);
       peer.destroy();
     });
@@ -97,12 +120,14 @@ export class OnlinePeer {
     const tid = targetId.toUpperCase();
     if (this.peers.has(tid)) return;
     
+    console.log(`📡 Initiating P2P connection to ${tid}...`);
     this.events.onStateChange("connecting");
     this.createPeer(tid, true);
   }
 
   public sendCode(code: string, isGlobal: boolean) {
     const payload = JSON.stringify({ content: code, isGlobal });
+    console.log(`📡 Sending P2P snippet to all peers...`);
     this.peers.forEach((peer) => {
       if (peer.connected) {
         peer.send(payload);
