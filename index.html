@@ -6,8 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PeerBin</title>
     <script>
+      // Shim global and process for Node-centric libraries (simple-peer)
       window.global = window;
-      window.process = { env: {} };
+      window.process = { 
+        env: { NODE_DEBUG: false },
+        version: '',
+        nextTick: (fn) => setTimeout(fn, 0) 
+      };
     </script>
   </head>
   <body>
